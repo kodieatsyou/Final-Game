@@ -1,5 +1,7 @@
 require "gosu"
 require_relative"z_order"
+require_relative"cursor"
+require_relative"itemcreater"
 
 class GameWindow < Gosu::Window
 
@@ -7,7 +9,7 @@ class GameWindow < Gosu::Window
 		super 640, 480
 		self.caption = "Rock Paper Scissors V2"
 
-		@background_image = Gosu::Image.new("media/background.jpg", 
+		@background_image = Gosu::Image.new("media/background.png", 
 																				:tileable => true)
 		@curtain01 = Gosu::Image.new("media/curtain01.jpg", 
 																				:tileable => true)
@@ -17,6 +19,9 @@ class GameWindow < Gosu::Window
 		@mainmenu = true
 		@curtain01_x = 0
 		@curtain02_x = 320
+		@cursor = Cursor.new("media/cursor.png", self)
+		itemcreater = Itemcreater.new("media/data.csv")
+		itemcreater.create_items
 	end
 
 	def update
@@ -25,6 +30,7 @@ class GameWindow < Gosu::Window
 	end
 
 	def draw
+		@cursor.draw
 		@background_image.draw(0, 0, ZOrder::BACKGROUND)
 		if @curtain01_x >= -320 && @curtain02_x <= 640
 			@curtain01.draw(@curtain01_x, 0, ZOrder::CURTAIN)
