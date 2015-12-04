@@ -21,7 +21,12 @@ class GameWindow < Gosu::Window
 		@curtain02_x = 320
 		@cursor = Cursor.new("media/cursor.png", self)
 		itemcreater = Itemcreater.new("media/data.csv")
-		itemcreater.create_items
+		itemcreater.get_info
+		itemcreater.create_item
+		@items = itemcreater.items
+		@items.each do |p|
+			p.info
+		end
 	end
 
 	def update

@@ -5,4 +5,11 @@ class Item
 		@loses = loses
 		@wins = wins
 	end
+
+	def info
+		puts @name
+		puts @image
+		puts @loses
+		puts @wins
+	end
 end
