@@ -25,8 +25,8 @@ class GameWindow < Gosu::Window
 		itemcreater.get_info
 		itemcreater.create_item
 		@items = itemcreater.items
-		ai = Ai.new(itemcreater)
-		ai.choose_item
+		@ai = Ai.new(itemcreater)
+		@ai.choose_item
 	end
 
 	def update
@@ -35,22 +35,19 @@ class GameWindow < Gosu::Window
 	end
 
 	def draw
-		@items.each do |i|
-			i.draw_player
-			i.draw_ai
-		end
 		@cursor.draw
 		@background_image.draw(0, 0, ZOrder::BACKGROUND)
 		if @curtain01_x >= -320 && @curtain02_x <= 640
 			@curtain01.draw(@curtain01_x, 0, ZOrder::CURTAIN)
 			@curtain02.draw(@curtain02_x, 0, ZOrder::CURTAIN)
+		else
+			@ai.draw_chosen
 		end
 	end
 
 	def button_down(id)
 		close if id == Gosu::KbEscape
 	end
-
 end
 
 window = GameWindow.new
