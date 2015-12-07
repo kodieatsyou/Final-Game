@@ -2,6 +2,7 @@ require "gosu"
 require_relative"z_order"
 require_relative"cursor"
 require_relative"itemcreater"
+require_relative"ai"
 
 class GameWindow < Gosu::Window
 
@@ -24,9 +25,8 @@ class GameWindow < Gosu::Window
 		itemcreater.get_info
 		itemcreater.create_item
 		@items = itemcreater.items
-		@items.each do |p|
-			p.info
-		end
+		ai = Ai.new(itemcreater)
+		ai.choose_item
 	end
 
 	def update
@@ -35,6 +35,10 @@ class GameWindow < Gosu::Window
 	end
 
 	def draw
+		@items.each do |i|
+			i.draw_player
+			i.draw_ai
+		end
 		@cursor.draw
 		@background_image.draw(0, 0, ZOrder::BACKGROUND)
 		if @curtain01_x >= -320 && @curtain02_x <= 640
