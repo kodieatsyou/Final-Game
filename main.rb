@@ -1,6 +1,5 @@
 require "gosu"
 require_relative"z_order"
-require_relative"cursor"
 require_relative"itemcreater"
 require_relative"ai"
 
@@ -20,7 +19,6 @@ class GameWindow < Gosu::Window
 		@mainmenu = true
 		@curtain01_x = 0
 		@curtain02_x = 320
-		@cursor = Cursor.new("media/cursor.png", self)
 		@startbutn = Gosu::Image.new("media/start.png")
 		@createbutn = Gosu::Image.new("media/create.png")
 		@menuarrow = Gosu::Image.new("media/arrow.png")
@@ -31,25 +29,39 @@ class GameWindow < Gosu::Window
 		@ai = Ai.new(itemcreater)
 		@ai.choose_item
 		@arrowpos = 0
+		@timer = 90
+		@time = Gosu::milliseconds
 	end
 
 	def update
 		@curtain01_x -= 2
 		@curtain02_x += 2
-		@arrowpos += 1 if Gosu::button_down? Gosu::KbDown
-		if @arrowpos > 2
-			@arrowpos = 0
+		if @arrowpos == 0 
+			play if Gosu::button_down? Gosu::KbEnter
+		elsif @arrowpos == 1 
+			create if Gosu::button_down? Gosu::KbEnter
+		end
+		if Gosu::milliseconds > @time			
+			@time = Gosu::milliseconds + @timer
+			@arrowpos += 1 if Gosu::button_down? Gosu::KbDown
+			@arrowpos -= 1 if Gosu::button_down? Gosu::KbUp
+				if @arrowpos > 1
+						@arrowpos = 0
+				elsif @arrowpos < 0 
+						@arrowpos = 1
+				end
 		end
 	end
 
 	def draw
-		@cursor.draw
 		@background_image.draw(0, 0, ZOrder::BACKGROUND)
-		if @curtain01_x >= -320 && @curtain02_x <= 640
-			@curtain01.draw(@curtain01_x, 0, ZOrder::MENU)
-			@curtain02.draw(@curtain02_x, 0, ZOrder::MENU)
-		else
-			draw_menu
+		if @mainmenu == true
+			if @curtain01_x >= -320 && @curtain02_x <= 640
+				@curtain01.draw(@curtain01_x, 0, ZOrder::MENU)
+				@curtain02.draw(@curtain02_x, 0, ZOrder::MENU)
+			else
+				draw_menu
+			end
 		end
 	end
 
@@ -57,11 +69,22 @@ class GameWindow < Gosu::Window
 		@startbutn.draw(self.width / 2 - 32, self.height / 2 - 96, ZOrder::MENU)
 		@createbutn.draw(self.width / 2 - 32, self.height / 2 - 48, ZOrder::MENU)
 		if @arrowpos == 0
-			@menuarrow.draw(self.width / 2 + 32, self.height / 2 - 96, ZOrder::MENU)
-		elsif @arrowpos == 2
-			@menuarrow.draw(self.width / 2 + 32, self.height / 2 - 48, ZOrder::MENU)
+			@menuarrow.draw(self.width / 2 - 64, self.height / 2 - 96, ZOrder::MENU)
+		elsif @arrowpos == 1
+			@menuarrow.draw(self.width / 2 - 64, self.height / 2 - 48, ZOrder::MENU)
 		end
 	end
+
+	def play
+		@mainmenu = false
+		puts "Play!"
+	end
+
+	def create
+		@mainmenu = false
+		puts 
+	end
+
 end
 
 window = GameWindow.new
