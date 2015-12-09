@@ -22,4 +22,9 @@ class Item
 	def draw_ai
 		@item_image.draw(440, 480 / 2, ZOrder::PLAYER)
 	end
+
+	def draw_select
+		@item_image.draw(640 / 2 - 32, 480 / 2 - 32, ZOrder::PLAYER)
+	end
+
 end

@@ -15,7 +15,7 @@ class GameWindow < Gosu::Window
 																				:tileable => true)
 		@curtain02 = Gosu::Image.new("media/curtain02.jpg", 
 																				:tileable => true)
-		@font = Gosu::Font.new(20)
+		@font = Gosu::Font.new(30)
 		@mainmenu = true
 		@curtain01_x = 0
 		@curtain02_x = 320
@@ -29,27 +29,51 @@ class GameWindow < Gosu::Window
 		@ai = Ai.new(itemcreater)
 		@ai.choose_item
 		@arrowpos = 0
-		@timer = 90
+		@timer = 85
 		@time = Gosu::milliseconds
+		@playing = false
+		@selecting = false
+		@creating = false
+		@curitem = 1
+		@selected = nil
 	end
 
 	def update
 		@curtain01_x -= 2
 		@curtain02_x += 2
-		if @arrowpos == 0 
-			play if Gosu::button_down? Gosu::KbEnter
-		elsif @arrowpos == 1 
-			create if Gosu::button_down? Gosu::KbEnter
-		end
 		if Gosu::milliseconds > @time			
 			@time = Gosu::milliseconds + @timer
 			@arrowpos += 1 if Gosu::button_down? Gosu::KbDown
 			@arrowpos -= 1 if Gosu::button_down? Gosu::KbUp
-				if @arrowpos > 1
-						@arrowpos = 0
-				elsif @arrowpos < 0 
-						@arrowpos = 1
+			if @selecting 
+				@curitem += 1 if Gosu::button_down? Gosu::KbRight
+				@curitem -= 1 if Gosu::button_down? Gosu::KbLeft
+				if @curitem > @items.length - 1
+					@curitem = 0
+				elsif @curitem < 0
+					@curitem = @items.length - 1
 				end
+				if Gosu::button_down? Gosu::KbSpace
+					@selected = @curitem 
+					@playing = true
+					@selecting = false
+				end
+			end
+			if @arrowpos > 1
+					@arrowpos = 0
+			elsif @arrowpos < 0 
+					@arrowpos = 1
+			end
+			if @arrowpos == 0 
+				@selecting = true if Gosu::button_down? Gosu::KbSpace
+			elsif @arrowpos == 1 
+				@creating = true if Gosu::button_down? Gosu::KbSpace
+			end
+			if @playing || @creating and Gosu::button_down? Gosu::KbEscape
+				@selecting = false
+				@creating = false
+				@mainmenu = true
+			end			
 		end
 	end
 
@@ -63,6 +87,13 @@ class GameWindow < Gosu::Window
 				draw_menu
 			end
 		end
+		if @selecting
+			select
+		elsif @creating 
+			create
+		elsif @playing 
+			play
+		end			
 	end
 
 	def draw_menu
@@ -75,14 +106,18 @@ class GameWindow < Gosu::Window
 		end
 	end
 
-	def play
+	def select
 		@mainmenu = false
-		puts "Play!"
+		@font.draw("Choose your item!", self.width / 2 - 90, self.height / 2 - 100, ZOrder::UI, 1.0, 1.0, 0xff_00FF15)
+		@items[@curitem].draw_select
 	end
 
 	def create
 		@mainmenu = false
-		puts 
+	end
+
+	def play
+		puts "yo"
 	end
 
 end
