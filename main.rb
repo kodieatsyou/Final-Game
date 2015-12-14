@@ -22,9 +22,8 @@ class GameWindow < Gosu::Window
 		itemcreater.get_info
 		itemcreater.create_item
 		@items = itemcreater.items
-		@control = Control.new(self, @items)
 		@ai = Ai.new(itemcreater)
-		@ai.choose_item
+		@control = Control.new(self, @items, @ai)
 		@timer = 85
 		@time = Gosu::milliseconds	
 	end
@@ -35,21 +34,23 @@ class GameWindow < Gosu::Window
 		if Gosu::milliseconds > @time			
 			@time = Gosu::milliseconds + @timer
 			@control.arrow_control
-			@control.exit_stage
+			if @control.curstage == 1
+				@control.selecting
+				@control.exit_stage
+			elsif @control.curstage == 2
+				@control.exit_stage
+			end
 		end
 	end
 
 	def draw
 		@background_image.draw(0, 0, ZOrder::BACKGROUND)
-		if @control.curstage == 0
-			if @curtain01_x >= -320 && @curtain02_x <= 640
-				@curtain01.draw(@curtain01_x, 0, ZOrder::MENU)
-				@curtain02.draw(@curtain02_x, 0, ZOrder::MENU)
-			else
-				@control.draw_menu
-			end
+		if @curtain01_x >= -320 && @curtain02_x <= 640
+			@curtain01.draw(@curtain01_x, 0, ZOrder::MENU)
+			@curtain02.draw(@curtain02_x, 0, ZOrder::MENU)
+		else
+			@control.draw
 		end
-		@control.draw	
 	end
 end
 

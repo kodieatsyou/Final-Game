@@ -11,8 +11,7 @@ class Ai
 		@item = rand(@items.length)
 	end
 
-	def draw_chosen
+	def draw
 		@items[@item].draw_ai
 	end
-
 end

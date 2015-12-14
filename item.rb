@@ -1,4 +1,5 @@
 class Item
+	attr_accessor :loses, :wins
 	def initialize(name, image, loses, wins)
 		@name = name
 		@image = image.chomp

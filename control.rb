@@ -4,11 +4,12 @@ require_relative "ai"
 require_relative "item"
 class Control
 	attr_accessor :curstage
-	def initialize(window, items)
+	def initialize(window, items, ai)
 		@mainmenu = true
 		@width = window.width
 		@height = window.height
 		@items = items
+		@ai = ai
 		@curstage = 0 #0 = mainmenu, 1 = play, 2 = create
 		@curitem = 1
 		@selected = nil
@@ -17,6 +18,8 @@ class Control
 		@startbutn = Gosu::Image.new("media/start.png")
 		@createbutn = Gosu::Image.new("media/create.png")
 		@menuarrow = Gosu::Image.new("media/arrow.png")
+		@ai_item = nil
+		@winner = nil #1 = player 2 = ai
 	end
 
 	def draw
@@ -24,16 +27,21 @@ class Control
 			play
 		elsif @curstage == 2
 			create
+		elsif @curstage == 0
+			main_menu
+		elsif @curstage == 3
+			battle
 		end
 	end
 
-	def draw_menu
-		@startbutn.draw(@width / 2 - 32, @height / 2 - 96, ZOrder::MENU)
-		@createbutn.draw(@width / 2 - 32, @height / 2 - 48, ZOrder::MENU)
+	def main_menu
+		@font.draw("Rock Paper Scissors!", @width / 2 - 105, @height / 2 - 100, ZOrder::UI, 1.0, 1.0, 0xff_00FF15)
+		@startbutn.draw(@width / 2 - 32, @height / 2 -48, ZOrder::MENU)
+		@createbutn.draw(@width / 2 - 32, @height / 2 , ZOrder::MENU)
 		if @arrowpos == 0
-			@menuarrow.draw(@width / 2 - 64, @height / 2 - 96, ZOrder::MENU)
-		elsif @arrowpos == 1
 			@menuarrow.draw(@width / 2 - 64, @height / 2 - 48, ZOrder::MENU)
+		elsif @arrowpos == 1
+			@menuarrow.draw(@width / 2 - 64, @height / 2, ZOrder::MENU)
 		end
 	end
 
@@ -62,24 +70,48 @@ class Control
 	end
 
 	def exit_stage
-		if @selecting || @creating and Gosu::button_down? Gosu::KbEscape
+		if Gosu::button_down? Gosu::KbEscape
 			@curstage = 0
 		end		
 	end
 
 	def selecting
-		if @playing
-			@curitem += 1 if Gosu::button_down? Gosu::KbRight
-			@curitem -= 1 if Gosu::button_down? Gosu::KbLeft
-			if @curitem > @items.length - 1
-				@curitem = 0
-			elsif @curitem < 0
-				@curitem = @items.length - 1
-			end
-			if Gosu::button_down? Gosu::KbSpace
-				@selected = @curitem
-			end
+		@curitem += 1 if Gosu::button_down? Gosu::KbRight
+		@curitem -= 1 if Gosu::button_down? Gosu::KbLeft
+		if @curitem > @items.length - 1
+			@curitem = 0
+		elsif @curitem < 0
+			@curitem = @items.length - 1
+		end
+		if Gosu::button_down? Gosu::KbSpace
+			@selected = @items[@curitem]
+			@curstage = 3
+			@ai.choose_item
+			@ai_item = @ai.item
 		end
 	end	
 
+	def battle
+		@font.draw("Fight!", @width / 2 - 40, @height / 2 - 150, ZOrder::UI, 1.0, 1.0, 0xff_00FF15)
+		@selected.draw_player
+		@ai.draw
+		check_winner
+	end
+
+	def check_winner
+		@selected.info
+		# @selected.loses = loses
+		# loses.each do |i|
+		# 	if i == @ai_item
+		# 		@winner = 2
+		# 		puts "hi"
+		# 	end
+		# end
+		# wins.each do |i|
+		# 	if i == @ai_item
+		# 		@winner = 1
+		# 		puts "heloo"
+		# 	end
+		# end
+	end
 end

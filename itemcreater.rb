@@ -15,7 +15,7 @@ class Itemcreater
 		f.each_line do |data|
 			@item_data.push(data)
 		end
-	end
+	ends
 
 	def create_item
 		@item_data.each do |d|
